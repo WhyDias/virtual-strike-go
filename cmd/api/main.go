@@ -7,7 +7,7 @@ import "virtual-strike-backend-go/internal/app"
 // @description     Virtual-strike-backend-go
 
 // @host      localhost:8836
-// @BasePath  /api/v1/colvir
+// @BasePath  /api/search
 
 func main() {
 	app.Run()
