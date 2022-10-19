@@ -1,14 +1,19 @@
 package service
 
-type Search interface {
+type Register interface {
+}
+
+type Login interface {
 }
 
 type Service struct {
-	Search
+	Register
+	Login
 }
 
 func NewService() *Service {
 	return &Service{
-		Search: NewSearchService(),
+		Register: NewRegisterService(),
+		Login:    NewLoginService(),
 	}
 }
