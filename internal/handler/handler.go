@@ -27,6 +27,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	protected.POST("/register", h.Register)
 	protected.POST("/time", h.Time)
 	protected.POST("/upload", h.Upload)
+	protected.POST("/workDayInfo", h.WorkDayInfo)
 
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
