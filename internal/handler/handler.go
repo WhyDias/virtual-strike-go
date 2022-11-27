@@ -26,6 +26,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	protected.Use(middleware.JwtAuthMiddleware())
 	protected.POST("/register", h.Register)
 	protected.POST("/time", h.Time)
+	protected.POST("/upload", h.Upload)
 
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
