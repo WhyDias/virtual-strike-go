@@ -4,27 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"virtual-strike-backend-go/pkg/models"
-	"virtual-strike-backend-go/pkg/utils/token"
+	"virtual-strike-backend-go/pkg/modules"
 )
-
-func (h *Handler) CurrentUser(c *gin.Context) {
-
-	user_id, err := token.ExtractTokenID(c)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	u, err := models.GetUserByID(user_id)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "success", "data": u})
-}
 
 type LoginInput struct {
 	Username string `json:"username" binding:"required"`
@@ -35,7 +16,10 @@ func (h *Handler) Login(c *gin.Context) {
 	var input LoginInput
 
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		var response modules.Response
+		response.Status = false
+		response.Message = err.Error()
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
@@ -47,11 +31,17 @@ func (h *Handler) Login(c *gin.Context) {
 	token, err := models.LoginCheck(u.Username, u.Password)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "username or password is incorrect."})
+		var response modules.Response
+		response.Status = false
+		response.Message = "username or password is incorrect"
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	var response modules.Response
+	response.Status = true
+	response.Message = token
+	c.JSON(http.StatusOK, gin.H{"status": true, "message": token})
 }
 
 type RegisterInput struct {
@@ -63,7 +53,10 @@ func (h *Handler) Register(c *gin.Context) {
 	var input RegisterInput
 
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		var response modules.Response
+		response.Status = false
+		response.Message = err.Error()
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
@@ -75,9 +68,15 @@ func (h *Handler) Register(c *gin.Context) {
 	_, err := u.SaveUser()
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		var response modules.Response
+		response.Status = false
+		response.Message = err.Error()
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "registration success"})
+	var response modules.Response
+	response.Status = true
+	response.Message = "registration success"
+	c.JSON(http.StatusOK, response)
 }

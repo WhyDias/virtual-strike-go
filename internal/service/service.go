@@ -1,19 +1,19 @@
 package service
 
-type Register interface {
-}
+import (
+	"virtual-strike-backend-go/pkg/modules"
+)
 
-type Login interface {
+type Time interface {
+	TimeLogic(jsonInput modules.TimeRequest) (code int, any modules.Response)
 }
 
 type Service struct {
-	Register
-	Login
+	Time
 }
 
 func NewService() *Service {
 	return &Service{
-		Register: NewRegisterService(),
-		Login:    NewLoginService(),
+		Time: NewTimeService(),
 	}
 }
