@@ -20,7 +20,7 @@ func (u *WorkDayInfoService) WorkDayInfoLogic(jsonInput modules.WorkDayInfoReque
 	requestBodyBytes := new(bytes.Buffer)
 	json.NewEncoder(requestBodyBytes).Encode(jsonInput)
 
-	var request modules.TimeRequest
+	var request modules.WorkDayInfoRequest
 	json.Unmarshal(requestBodyBytes.Bytes(), &request)
 
 	db, err := sql.Open("mysql", "root:admin@tcp(localhost:3306)/DB_virtual")
@@ -47,10 +47,10 @@ func (u *WorkDayInfoService) WorkDayInfoLogic(jsonInput modules.WorkDayInfoReque
 		logrus.Error(req.Error())
 		return 500, response
 	default:
+
 		var response modules.Response
 		response.Status = true
 		response.Message = "Success"
 		return 200, response
 	}
-
 }
