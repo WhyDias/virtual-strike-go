@@ -27,7 +27,7 @@ func (t *TimeService) TimeLogic(jsonInput modules.TimeRequest) (code int, any mo
 
 	unixTime := time.Now().Unix() + 21600
 
-	db, err := sql.Open("mysql", "root:admin@tcp(localhost:3306)/DB_virtual")
+	db, err := sql.Open("mysql", "admin:admin@tcp(localhost:3306)/virtual-strike")
 	if err != nil {
 		log.Print(err.Error())
 	}

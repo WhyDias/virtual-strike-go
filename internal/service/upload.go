@@ -2,9 +2,11 @@ package service
 
 import (
 	"bytes"
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"github.com/lithammer/shortuuid"
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"log"
@@ -27,7 +29,7 @@ func (u *UploadService) UploadLogic(jsonInput modules.UploadRequest) (code int, 
 	var request modules.UploadRequest
 	json.Unmarshal(requestBodyBytes.Bytes(), &request)
 
-	db, err := sql.Open("mysql", "root:admin@tcp(localhost:3306)/DB_virtual")
+	db, err := sql.Open("mysql", "admin:admin@tcp(localhost:3306)/virtual-strike")
 	if err != nil {
 		log.Print(err.Error())
 	}
@@ -64,13 +66,48 @@ func (u *UploadService) UploadLogic(jsonInput modules.UploadRequest) (code int, 
 		}
 
 		pathToFile := "/statistic_" + time.Now().Format("2006-01-02_3-4-5")
-		write := ioutil.WriteFile(path+pathToFile, []byte(request.Data), 0700)
+		data, err := json.Marshal(request.Data)
+		if err != nil {
+			panic(err)
+		}
+
+		write := ioutil.WriteFile(path+pathToFile, data, 0700)
 		if write != nil {
 			var response modules.Response
 			response.Status = false
 			response.Message = write.Error()
 			logrus.Error(write.Error())
 			return 500, response
+		}
+
+		idPoint := shortuuid.New()
+
+		queryForPoint := "INSERT INTO point (`id`, `owner`, `identifier_tariff`, `StartWorkDate`, `EndWorkDate`) VALUES (?, ?, ?, ?, ?)"
+		insertResult, err := db.ExecContext(context.Background(), queryForPoint, idPoint, request.Identification, request.Data.IdentifierTariff, request.Data.StartWorkDate, request.Data.EndWorkDate)
+		if err != nil {
+			logrus.Fatalf("impossible insert data: %s", err)
+		}
+		idForPoints, err := insertResult.LastInsertId()
+		if err != nil {
+			logrus.Fatalf("impossible to retrieve last inserted id: %s", err)
+		}
+		logrus.Printf("inserted id: %d, %s", idForPoints, idPoint)
+
+		tariffs := request.Data.Tariffs
+
+		for _, tariff := range tariffs {
+			idPointTariff := shortuuid.New()
+			queryForPointTariff := "INSERT INTO point_tariffs (`point_id`,`id`, `GetTimeCreate`, `GetTimeExpired`, `GetTimeUsed`, `GetIdentifier`, `GetTitle`, `GetCost`, `GetTime`, `GetTimeLeft`, `GetTariffStatus`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+			insertResult, err := db.ExecContext(context.Background(), queryForPointTariff, idPoint, idPointTariff, tariff.GetTimeCreate, tariff.GetTimeExpired, tariff.GetTimeUsed, tariff.GetIdentifier, tariff.GetTitle, tariff.GetCost, tariff.GetTime, tariff.GetTimeLeft, tariff.GetTariffStatus)
+			if err != nil {
+				logrus.Fatalf("impossible insert data: %s", err)
+			}
+			idForPointsTariff, err := insertResult.LastInsertId()
+			if err != nil {
+				logrus.Fatalf("impossible to retrieve last inserted id: %s", err)
+			}
+			logrus.Printf("inserted id: %d, %s", idForPointsTariff, idPointTariff)
+
 		}
 
 		var response modules.Response

@@ -23,7 +23,7 @@ func (u *WorkDayInfoService) WorkDayInfoLogic(jsonInput modules.WorkDayInfoReque
 	var request modules.WorkDayInfoRequest
 	json.Unmarshal(requestBodyBytes.Bytes(), &request)
 
-	db, err := sql.Open("mysql", "root:admin@tcp(localhost:3306)/DB_virtual")
+	db, err := sql.Open("mysql", "admin:admin@tcp(localhost:3306)/virtual-strike")
 	if err != nil {
 		log.Print(err.Error())
 	}
