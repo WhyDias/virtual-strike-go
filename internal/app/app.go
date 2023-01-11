@@ -41,7 +41,7 @@ func Run() {
 		}
 	}()
 
-	logrus.Printf("server is starting at port: %s", "8877")
+	logrus.Printf("server is starting at port: %s", viper.GetString("PORT"))
 
 	exit := make(chan os.Signal, 1)
 	signal.Notify(exit, syscall.SIGTERM, syscall.SIGINT)

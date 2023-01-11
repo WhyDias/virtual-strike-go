@@ -29,7 +29,7 @@ func (u *UploadService) UploadLogic(jsonInput modules.UploadRequest) (code int, 
 	var request modules.UploadRequest
 	json.Unmarshal(requestBodyBytes.Bytes(), &request)
 
-	db, err := sql.Open("mysql", "admin:admin@tcp(localhost:3306)/virtual-strike")
+	db, err := sql.Open("mysql", "admin:admin@tcp(31.172.64.249:3306)/virtual-strike")
 	if err != nil {
 		log.Print(err.Error())
 	}

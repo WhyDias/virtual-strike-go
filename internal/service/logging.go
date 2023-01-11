@@ -27,7 +27,7 @@ func (u *LoggingService) LoggingLogic(jsonInput modules.LoggingRequest) (code in
 	var request modules.LoggingRequest
 	json.Unmarshal(requestBodyBytes.Bytes(), &request)
 
-	db, err := sql.Open("mysql", "admin:admin@tcp(localhost:3306)/virtual-strike")
+	db, err := sql.Open("mysql", "admin:admin@tcp(31.172.64.249:3306)/virtual-strike")
 	if err != nil {
 		log.Print(err.Error())
 	}
@@ -51,15 +51,21 @@ func (u *LoggingService) LoggingLogic(jsonInput modules.LoggingRequest) (code in
 		logrus.Error(req.Error())
 		return 500, response
 	default:
-		path := "./" + request.Identification + "/logs"
+		path := "./" + request.Identification
 		if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
 			err := os.Mkdir(path, os.ModePerm)
 			if err != nil {
-				var response modules.Response
-				response.Status = false
-				response.Message = err.Error()
-				logrus.Error(err.Error())
-				return 500, response
+				pathLogs := "./logs"
+				if _, _ = os.Stat(pathLogs); errors.Is(err, os.ErrNotExist) {
+					errLog := os.Mkdir(pathLogs, os.ModePerm)
+					if errLog != nil {
+						var response modules.Response
+						response.Status = false
+						response.Message = err.Error()
+						logrus.Error(err.Error())
+						return 500, response
+					}
+				}
 			}
 		}
 
