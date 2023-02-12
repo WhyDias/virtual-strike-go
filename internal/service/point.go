@@ -5,7 +5,9 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"log"
+	"os"
 	"strings"
 	"virtual-strike-backend-go/pkg/modules"
 )
@@ -24,8 +26,16 @@ func (p *PointService) PointLogic(jsonInput modules.PointRequest) (code int, any
 	json.Unmarshal(requestBodyBytes.Bytes(), &request)
 
 	var res []modules.PointResponse
+	Driver := os.Getenv("DB_DRIVER")
+	DbHost := os.Getenv("DB_HOST")
+	DbUser := os.Getenv("DB_USER")
+	DbPassword := os.Getenv("DB_PASSWORD")
+	DbName := os.Getenv("DB_NAME")
+	DbPort := os.Getenv("DB_PORT")
 
-	db, err := sql.Open("mysql", "admin:admin@tcp(31.172.64.249:3306)/virtual-strike")
+	DBURL := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", DbUser, DbPassword, DbHost, DbPort, DbName)
+
+	db, err := sql.Open(Driver, DBURL)
 	if err != nil {
 		log.Print(err.Error())
 		return 500, res

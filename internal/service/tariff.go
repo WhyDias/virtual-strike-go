@@ -8,23 +8,21 @@ import (
 	"github.com/sirupsen/logrus"
 	"log"
 	"os"
-	"virtual-strike-backend-go/pkg/models"
 	"virtual-strike-backend-go/pkg/modules"
 )
 
-type WorkDayInfoService struct{}
+type TariffService struct{}
 
-func NewWorkDayInfoService() *WorkDayInfoService {
-	return &WorkDayInfoService{}
+func NewTariffService() *TariffService {
+	return &TariffService{}
 }
 
-func (u *WorkDayInfoService) WorkDayInfoLogic(jsonInput modules.WorkDayInfoRequest) (code int, any modules.Response) {
+func (u *TariffService) TariffLogic(jsonInput modules.TariffRequest) (code int, any modules.TariffResponse) {
 	requestBodyBytes := new(bytes.Buffer)
 	json.NewEncoder(requestBodyBytes).Encode(jsonInput)
 
-	var request modules.WorkDayInfoRequest
+	var request modules.TariffRequest
 	json.Unmarshal(requestBodyBytes.Bytes(), &request)
-
 	Driver := os.Getenv("DB_DRIVER")
 	DbHost := os.Getenv("DB_HOST")
 	DbUser := os.Getenv("DB_USER")
@@ -41,27 +39,24 @@ func (u *WorkDayInfoService) WorkDayInfoLogic(jsonInput modules.WorkDayInfoReque
 
 	defer db.Close()
 
-	var points models.Points
+	var tariff modules.TariffResponse
 
-	req := db.QueryRow("SELECT * FROM points WHERE points.identifier = ?", request.Identification).Scan(&points.ID, &points.PointName, &points.Identifier, &points.IsAccess, &points.BundleID)
+	req := db.QueryRow("SELECT owner, identifier_tariff FROM point WHERE StartWorkDate = ?", request.Data).Scan(&tariff.Owner, &tariff.IdentifierTariff)
 	switch {
 	case req == sql.ErrNoRows:
-		var response modules.Response
-		response.Status = false
-		response.Message = req.Error()
+		var response modules.TariffResponse
+		response.ErrorMessage = req.Error()
 		logrus.Error(req.Error())
 		return 500, response
 	case req != nil:
-		var response modules.Response
-		response.Status = false
-		response.Message = req.Error()
+		var response modules.TariffResponse
+		response.ErrorMessage = req.Error()
 		logrus.Error(req.Error())
 		return 500, response
 	default:
-
-		var response modules.Response
-		response.Status = true
-		response.Message = "Success"
+		var response modules.TariffResponse
+		response.Owner = tariff.Owner
+		response.IdentifierTariff = tariff.IdentifierTariff
 		return 200, response
 	}
 }

@@ -24,12 +24,22 @@ type Logging interface {
 	LoggingLogic(jsonInput modules.LoggingRequest) (code int, any modules.Response)
 }
 
+type Tariff interface {
+	TariffLogic(jsonInput modules.TariffRequest) (code int, any modules.TariffResponse)
+}
+
+type Customer interface {
+	CustomerLogic(jsonInput modules.CustomerRequest) (code int, any modules.CustomerResponse)
+}
+
 type Service struct {
 	Time
 	Upload
 	WorkDayInfo
 	Point
 	Logging
+	Customer
+	Tariff
 }
 
 func NewService() *Service {
@@ -39,5 +49,7 @@ func NewService() *Service {
 		WorkDayInfo: NewWorkDayInfoService(),
 		Point:       NewPointService(),
 		Logging:     NewLoggingService(),
+		Customer:    NewCustomerService(),
+		Tariff:      NewTariffService(),
 	}
 }

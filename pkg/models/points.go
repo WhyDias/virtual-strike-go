@@ -6,4 +6,5 @@ type Points struct {
 	Identifier string `json:"identifier"`
 	IsAccess   int    `json:"isAccess"`
 	BundleID   int    `json:"bundleId"`
+	Owner      string `json:"owner"`
 }
