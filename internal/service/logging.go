@@ -45,7 +45,7 @@ func (u *LoggingService) LoggingLogic(jsonInput modules.LoggingRequest) (code in
 
 	var points models.Points
 
-	req := db.QueryRow("SELECT * FROM points WHERE points.identifier = ?", request.Identification).Scan(&points.ID, &points.PointName, &points.Identifier, &points.IsAccess, &points.BundleID)
+	req := db.QueryRow("SELECT * FROM points WHERE points.identifier = ?", request.Identification).Scan(&points.ID, &points.PointName, &points.Identifier, &points.IsAccess, &points.BundleID, &points.Owner)
 	switch {
 	case req == sql.ErrNoRows:
 		var response modules.Response
