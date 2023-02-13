@@ -88,7 +88,7 @@ func (u *LoggingService) LoggingLogic(jsonInput modules.LoggingRequest) (code in
 
 		saveId := shortuuid.New()
 		saveQuery := "INSERT INTO logging (`id`, `date`, `data`) VALUES (?, ?, ?)"
-		saveResult, err := db.ExecContext(context.Background(), saveQuery, saveId, time.Now().Format("2006-01-02_3-4-5"), data)
+		saveResult, err := db.ExecContext(context.Background(), saveQuery, saveId, time.Now().Format("2006-01-02"), data)
 		if err != nil {
 			logrus.Fatalf("impossible insert data: %s", err)
 		}

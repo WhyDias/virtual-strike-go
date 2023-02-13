@@ -5,9 +5,9 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"log"
 	"os"
+	"strings"
 	"virtual-strike-backend-go/pkg/modules"
 )
 
@@ -17,7 +17,7 @@ func NewTariffService() *TariffService {
 	return &TariffService{}
 }
 
-func (u *TariffService) TariffLogic(jsonInput modules.TariffRequest) (code int, any modules.TariffResponse) {
+func (u *TariffService) TariffLogic(jsonInput modules.TariffRequest) (code int, any []modules.TariffResponse) {
 	requestBodyBytes := new(bytes.Buffer)
 	json.NewEncoder(requestBodyBytes).Encode(jsonInput)
 
@@ -39,24 +39,30 @@ func (u *TariffService) TariffLogic(jsonInput modules.TariffRequest) (code int, 
 
 	defer db.Close()
 
+	var tariffs []modules.TariffResponse
+
+	rows, err := db.Query("SELECT id, data FROM statistics WHERE date = ?", request.Date)
+	if err != nil {
+		log.Print(err.Error())
+		return 500, tariffs
+	}
+
 	var tariff modules.TariffResponse
 
-	req := db.QueryRow("SELECT owner, identifier_tariff FROM point WHERE StartWorkDate = ?", request.Data).Scan(&tariff.Owner, &tariff.IdentifierTariff)
-	switch {
-	case req == sql.ErrNoRows:
-		var response modules.TariffResponse
-		response.ErrorMessage = req.Error()
-		logrus.Error(req.Error())
-		return 500, response
-	case req != nil:
-		var response modules.TariffResponse
-		response.ErrorMessage = req.Error()
-		logrus.Error(req.Error())
-		return 500, response
-	default:
-		var response modules.TariffResponse
-		response.Owner = tariff.Owner
-		response.IdentifierTariff = tariff.IdentifierTariff
-		return 200, response
+	for rows.Next() {
+		var id, data string
+		err = rows.Scan(&id, &data)
+		if err != nil {
+			log.Println(err.Error())
+			return 500, tariffs
+		}
+
+		tariff.ID = id
+		stri := strings.ReplaceAll(data, "/", "")
+		fmt.Println(stri)
+		fmt.Println(data)
+		tariff.Data = data
+		tariffs = append(tariffs, tariff)
 	}
+	return 200, tariffs
 }

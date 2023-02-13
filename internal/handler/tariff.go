@@ -25,7 +25,7 @@ func (h *Handler) Tariff(c *gin.Context) {
 
 	if code != 200 {
 		logrus.Error()
-		monitoring.ErrorHandler.With(prometheus.Labels{"error_message": any.ErrorMessage}).Inc()
+		monitoring.ErrorHandler.With(prometheus.Labels{"error_message": "Something is wrong"}).Inc()
 	}
 
 	c.JSON(code, any)

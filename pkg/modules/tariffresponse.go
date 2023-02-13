@@ -1,7 +1,6 @@
 package modules
 
 type TariffResponse struct {
-	Owner            string `json:"owner"`
-	IdentifierTariff string `json:"identifier_tariff"`
-	ErrorMessage     string `json:"errorMessage"`
+	ID   string `json:"id"`
+	Data string `json:"data"`
 }

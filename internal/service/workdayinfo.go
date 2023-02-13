@@ -58,7 +58,6 @@ func (u *WorkDayInfoService) WorkDayInfoLogic(jsonInput modules.WorkDayInfoReque
 		logrus.Error(req.Error())
 		return 500, response
 	default:
-
 		var response modules.Response
 		response.Status = true
 		response.Message = "Success"

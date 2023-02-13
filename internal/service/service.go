@@ -25,7 +25,7 @@ type Logging interface {
 }
 
 type Tariff interface {
-	TariffLogic(jsonInput modules.TariffRequest) (code int, any modules.TariffResponse)
+	TariffLogic(jsonInput modules.TariffRequest) (code int, any []modules.TariffResponse)
 }
 
 type Customer interface {
