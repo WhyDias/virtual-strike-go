@@ -2,10 +2,12 @@ package service
 
 import (
 	"bytes"
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/lithammer/shortuuid"
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"log"
@@ -83,6 +85,18 @@ func (u *LoggingService) LoggingLogic(jsonInput modules.LoggingRequest) (code in
 		if err != nil {
 			panic(err)
 		}
+
+		saveId := shortuuid.New()
+		saveQuery := "INSERT INTO logging (`id`, `date`, `data`) VALUES (?, ?, ?)"
+		saveResult, err := db.ExecContext(context.Background(), saveQuery, saveId, time.Now().Format("2006-01-02_3-4-5"), data)
+		if err != nil {
+			logrus.Fatalf("impossible insert data: %s", err)
+		}
+		idForSave, err := saveResult.LastInsertId()
+		if err != nil {
+			logrus.Fatalf("impossible to retrieve last inserted id: %s", err)
+		}
+		logrus.Printf("inserted id: %d, %s", idForSave, saveId)
 
 		write := ioutil.WriteFile(path+pathToFile, data, 0700)
 		if write != nil {

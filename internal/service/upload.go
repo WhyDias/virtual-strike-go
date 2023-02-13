@@ -80,6 +80,18 @@ func (u *UploadService) UploadLogic(jsonInput modules.UploadRequest) (code int, 
 			panic(err)
 		}
 
+		saveId := shortuuid.New()
+		saveQuery := "INSERT INTO statistics (`id`, `date`, `data`) VALUES (?, ?, ?)"
+		saveResult, err := db.ExecContext(context.Background(), saveQuery, saveId, time.Now().Format("2006-01-02_3-4-5"), data)
+		if err != nil {
+			logrus.Fatalf("impossible insert data: %s", err)
+		}
+		idForSave, err := saveResult.LastInsertId()
+		if err != nil {
+			logrus.Fatalf("impossible to retrieve last inserted id: %s", err)
+		}
+		logrus.Printf("inserted id: %d, %s", idForSave, saveId)
+
 		write := ioutil.WriteFile(path+pathToFile, data, 0700)
 		if write != nil {
 			var response modules.Response
