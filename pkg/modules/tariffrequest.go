@@ -1,5 +1,5 @@
 package modules
 
 type TariffRequest struct {
-	Date string `json:"date"`
+	Date string `form:"date" binding:"required"`
 }

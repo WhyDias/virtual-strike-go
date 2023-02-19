@@ -1,5 +1,5 @@
 package modules
 
 type PointRequest struct {
-	Username string `json:"username" binding:"required"`
+	Username string `form:"username" binding:"required"`
 }

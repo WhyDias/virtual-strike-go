@@ -11,7 +11,7 @@ import (
 
 func (h *Handler) Time(c *gin.Context) {
 	var jsonInput modules.TimeRequest
-	if err := c.ShouldBindJSON(&jsonInput); err != nil {
+	if err := c.ShouldBind(&jsonInput); err != nil {
 		var response modules.Response
 		response.Status = false
 		response.Message = err.Error()

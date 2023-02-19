@@ -1,5 +1,5 @@
 package modules
 
 type TimeRequest struct {
-	Identification string `json:"identification" binding:"required"`
+	Identification string `form:"identification" binding:"required"`
 }

@@ -1,6 +1,6 @@
 package modules
 
 type WorkDayInfoRequest struct {
-	Identification      string `json:"identification" binding:"required"`
-	IdentificationTarif string `json:"identificationTarif" binding:"required"`
+	Identification      string `form:"identification" binding:"required"`
+	IdentificationTarif string `form:"identificationTarif" binding:"required"`
 }

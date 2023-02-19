@@ -1,5 +1,5 @@
 package modules
 
 type CustomerRequest struct {
-	Username string `json:"username"`
+	Username string `form:"username" binding:"required"`
 }

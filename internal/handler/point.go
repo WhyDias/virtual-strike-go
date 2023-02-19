@@ -19,7 +19,7 @@ func (h *Handler) Point(c *gin.Context) {
 	c.Next()
 
 	var jsonInput modules.PointRequest
-	if err := c.ShouldBindJSON(&jsonInput); err != nil {
+	if err := c.ShouldBind(&jsonInput); err != nil {
 		var response modules.Response
 		response.Status = false
 		response.Message = err.Error()

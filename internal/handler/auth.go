@@ -8,14 +8,14 @@ import (
 )
 
 type LoginInput struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Username string `form:"username" binding:"required"`
+	Password string `form:"password" binding:"required"`
 }
 
 func (h *Handler) Login(c *gin.Context) {
 	var input LoginInput
 
-	if err := c.ShouldBindJSON(&input); err != nil {
+	if err := c.ShouldBind(&input); err != nil {
 		var response modules.Response
 		response.Status = false
 		response.Message = err.Error()
