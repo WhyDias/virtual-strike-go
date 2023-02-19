@@ -4,20 +4,22 @@ import "time"
 
 type UploadRequest struct {
 	Identification string `form:"identification"`
-	Data           struct {
-		IdentifierTariff string    `form:"identifier-tariff"`
-		StartWorkDate    time.Time `form:"StartWorkDate"`
-		EndWorkDate      string    `form:"EndWorkDate"`
-		Tariffs          []struct {
-			GetTimeCreate   string  `form:"GetTimeCreate"`
-			GetTimeExpired  string  `form:"GetTimeExpired"`
-			GetTimeUsed     float64 `form:"GetTimeUsed"`
-			GetIdentifier   string  `form:"GetIdentifier"`
-			GetTitle        string  `form:"GetTitle"`
-			GetCost         float64 `form:"GetCost"`
-			GetTime         float64 `form:"GetTime"`
-			GetTimeLeft     float64 `form:"GetTimeLeft"`
-			GetTariffStatus int     `form:"GetTariffStatus"`
-		} `json:"Tariffs"`
-	} `json:"data"`
+	Data           string `form:"data" binding:"required"`
+}
+
+type Data struct {
+	IdentifierTariff string
+	StartWorkDate    time.Time
+	EndWorkDate      string
+	Tariffs          []struct {
+		GetTimeCreate   string
+		GetTimeExpired  string
+		GetTimeUsed     float64
+		GetIdentifier   string
+		GetTitle        string
+		GetCost         float64
+		GetTime         float64
+		GetTimeLeft     float64
+		GetTariffStatus int
+	}
 }

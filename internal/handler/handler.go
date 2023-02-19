@@ -42,10 +42,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	router.Use(mw)
 	router.POST("/api/login", h.Login)
-	router.POST("/points", h.Point)
 	protected := router.Group("/api/admin")
 	protected.Use(middleware.JwtAuthMiddleware())
 	protected.POST("/register", h.Register)
+	protected.POST("/points", h.Point)
 	protected.POST("/time", h.Time)
 	protected.POST("/upload", h.Upload)
 	protected.POST("/workDayInfo", h.WorkDayInfo)

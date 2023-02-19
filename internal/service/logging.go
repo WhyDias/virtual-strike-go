@@ -80,36 +80,67 @@ func (u *LoggingService) LoggingLogic(jsonInput modules.LoggingRequest) (code in
 			}
 		}
 
-		pathToFile := "/logging_" + time.Now().Format("2006-01-02_3-4-5")
-		data, err := json.Marshal(request.Data)
-		if err != nil {
-			panic(err)
-		}
-
-		saveId := shortuuid.New()
-		saveQuery := "INSERT INTO logging (`id`, `date`, `data`) VALUES (?, ?, ?)"
-		saveResult, err := db.ExecContext(context.Background(), saveQuery, saveId, time.Now().Format("2006-01-02"), data)
-		if err != nil {
-			logrus.Fatalf("impossible insert data: %s", err)
-		}
-		idForSave, err := saveResult.LastInsertId()
-		if err != nil {
-			logrus.Fatalf("impossible to retrieve last inserted id: %s", err)
-		}
-		logrus.Printf("inserted id: %d, %s", idForSave, saveId)
-
-		write := ioutil.WriteFile(path+pathToFile, data, 0700)
-		if write != nil {
+		var isAccess int
+		requestForAccess := db.QueryRow("SELECT IF((SELECT count(*) as cnt FROM logging WHERE identifier = ? and date = ?) > 3, 1, 0)", request.Identification, time.Now().Format("2006-01-02")).Scan(&isAccess)
+		switch {
+		case requestForAccess == sql.ErrNoRows:
 			var response modules.Response
 			response.Status = false
-			response.Message = write.Error()
-			logrus.Error(write.Error())
+			response.Message = requestForAccess.Error()
+			logrus.Error(requestForAccess.Error())
 			return 500, response
-		}
+		case requestForAccess != nil:
+			var response modules.Response
+			response.Status = false
+			response.Message = requestForAccess.Error()
+			logrus.Error(requestForAccess.Error())
+			return 500, response
+		default:
+			if isAccess == 0 {
+				pathToFile := "/logging_" + time.Now().Format("2006-01-02_3-4-5")
+				data, err := json.Marshal(request.Data)
+				if err != nil {
+					panic(err)
+				}
+				saveId := shortuuid.New()
+				saveQuery := "INSERT INTO logging (`id`, `date`, `data`, `identifier`) VALUES (?, ?, ?, ?)"
+				saveResult, err := db.ExecContext(context.Background(), saveQuery, saveId, time.Now().Format("2006-01-02"), data, request.Identification)
+				if err != nil {
+					var response modules.Response
+					response.Status = false
+					response.Message = err.Error()
+					logrus.Error(err.Error())
+					return 500, response
+				}
+				idForSave, err := saveResult.LastInsertId()
+				if err != nil {
+					var response modules.Response
+					response.Status = false
+					response.Message = err.Error()
+					logrus.Error(err.Error())
+					return 500, response
+				}
+				logrus.Printf("inserted id: %d, %s", idForSave, saveId)
 
-		var response modules.Response
-		response.Status = true
-		response.Message = "Create successfully"
-		return 200, response
+				write := ioutil.WriteFile(path+pathToFile, data, 0700)
+				if write != nil {
+					var response modules.Response
+					response.Status = false
+					response.Message = write.Error()
+					logrus.Error(write.Error())
+					return 500, response
+				}
+
+				var response modules.Response
+				response.Status = true
+				response.Message = "Create successfully"
+				return 200, response
+			} else {
+				var response modules.Response
+				response.Status = false
+				response.Message = "Database have more than 3 record on this date"
+				return 500, response
+			}
+		}
 	}
 }
