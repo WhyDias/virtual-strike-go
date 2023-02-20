@@ -25,7 +25,7 @@ func (h *Handler) Customer(c *gin.Context) {
 
 	if code != 200 {
 		logrus.Error()
-		monitoring.ErrorHandler.With(prometheus.Labels{"error_message": any.Message.ErrorMessage}).Inc()
+		monitoring.ErrorHandler.With(prometheus.Labels{"error_messages": any.Message.ErrorMessage}).Inc()
 	}
 
 	c.JSON(code, any)
