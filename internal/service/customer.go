@@ -42,10 +42,11 @@ func (u *CustomerService) CustomerLogic(jsonInput modules.CustomerRequest) (code
 
 	defer db.Close()
 
-	rowForPoints, err := db.Query("SELECT points from customers WHERE username = ?", request.Username)
+	rowForPoints, err := db.Query("SELECT points from users WHERE username = ?", request.Username)
 	if err != nil {
 		var response modules.CustomerResponse
-		response.ErrorMessage = err.Error()
+		response.Status = false
+		response.Message.ErrorMessage = err.Error()
 		logrus.Error(err)
 		return 500, response
 	}
@@ -56,7 +57,8 @@ func (u *CustomerService) CustomerLogic(jsonInput modules.CustomerRequest) (code
 		error := rowForPoints.Scan(&pointOwner)
 		if error != nil {
 			var response modules.CustomerResponse
-			response.ErrorMessage = error.Error()
+			response.Status = false
+			response.Message.ErrorMessage = error.Error()
 			logrus.Error(err)
 			return 500, response
 		}
@@ -75,27 +77,31 @@ func (u *CustomerService) CustomerLogic(jsonInput modules.CustomerRequest) (code
 	switch {
 	case req == sql.ErrNoRows:
 		var response modules.CustomerResponse
-		response.ErrorMessage = req.Error()
+		response.Status = false
+		response.Message.ErrorMessage = req.Error()
 		logrus.Error(req.Error())
 		return 500, response
 	case req != nil:
 		var response modules.CustomerResponse
-		response.ErrorMessage = req.Error()
+		response.Status = false
+		response.Message.ErrorMessage = req.Error()
 		logrus.Error(req.Error())
 		return 500, response
 	default:
 		if request.Username != points.Owner {
 			var response modules.CustomerResponse
-			response.ErrorMessage = req.Error()
+			response.Status = false
+			response.Message.ErrorMessage = req.Error()
 			logrus.Error(req.Error())
 			return 500, response
 		} else {
 			var response modules.CustomerResponse
-			response.ID = points.ID
-			response.PointName = points.PointName
-			response.Identifier = points.Identifier
-			response.IsAccess = points.IsAccess
-			response.BundleID = points.BundleID
+			response.Status = true
+			response.Message.ID = points.ID
+			response.Message.PointName = points.PointName
+			response.Message.Identifier = points.Identifier
+			response.Message.IsAccess = points.IsAccess
+			response.Message.BundleID = points.BundleID
 			return 200, response
 		}
 	}

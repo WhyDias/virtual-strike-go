@@ -91,7 +91,6 @@ func (u *UploadService) UploadLogic(jsonInput modules.UploadRequest) (code int, 
 			return 500, response
 		default:
 			if isAccess == 0 {
-
 				pathToFile := "/statistic_" + time.Now().Format("2006-01-02_3-4-5")
 				data, err := json.Marshal(request.Data)
 				if err != nil {
