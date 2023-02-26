@@ -123,7 +123,7 @@ func (u *LoggingService) LoggingLogic(jsonInput modules.LoggingRequest) (code in
 				}
 				logrus.Printf("inserted id: %d, %s", idForSave, saveId)
 
-				write := ioutil.WriteFile(path+pathToFile, data, 0700)
+				write := ioutil.WriteFile(path+pathToFile, data, 0777)
 				if write != nil {
 					var response modules.Response
 					response.Status = false
