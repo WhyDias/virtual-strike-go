@@ -95,7 +95,7 @@ func (u *LoggingService) LoggingLogic(jsonInput modules.LoggingRequest) (code in
 			return 500, response
 		default:
 			if isAccess == 0 {
-				currentTime := time.Now().Add(time.Hour * 6)
+				currentTime := time.Now().Add(time.Hour * 5)
 				pathToFile := "/logging_" + currentTime.Format("2006-01-02_3-4-5")
 				data, err := json.Marshal(request.Data)
 				if err != nil {
