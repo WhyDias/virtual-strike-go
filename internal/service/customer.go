@@ -72,7 +72,7 @@ func (u *CustomerService) CustomerLogic(jsonInput modules.CustomerRequest) (code
 	defer rowForPoints.Close()
 
 	var points models.Points
-
+	fmt.Println(string(pointsDecode))
 	req := db.QueryRow("SELECT * FROM points WHERE points.identifier = ?", string(pointsDecode)).Scan(&points.ID, &points.PointName, &points.Identifier, &points.IsAccess, &points.BundleID, &points.Owner)
 	switch {
 	case req == sql.ErrNoRows:

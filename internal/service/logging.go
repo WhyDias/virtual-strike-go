@@ -2,12 +2,10 @@ package service
 
 import (
 	"bytes"
-	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/lithammer/shortuuid"
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"log"
@@ -97,32 +95,14 @@ func (u *LoggingService) LoggingLogic(jsonInput modules.LoggingRequest) (code in
 			return 500, response
 		default:
 			if isAccess == 0 {
-				pathToFile := "/logging_" + time.Now().Format("2006-01-02_3-4-5")
+				currentTime := time.Now().Add(time.Hour * 6)
+				pathToFile := "/logging_" + currentTime.Format("2006-01-02_3-4-5")
 				data, err := json.Marshal(request.Data)
 				if err != nil {
 					panic(err)
 				}
-				saveId := shortuuid.New()
-				saveQuery := "INSERT INTO logging (`id`, `date`, `data`, `identifier`) VALUES (?, ?, ?, ?)"
-				saveResult, err := db.ExecContext(context.Background(), saveQuery, saveId, time.Now().Format("2006-01-02"), data, request.Identification)
-				if err != nil {
-					var response modules.Response
-					response.Status = false
-					response.Message = err.Error()
-					logrus.Error(err.Error())
-					return 500, response
-				}
-				idForSave, err := saveResult.LastInsertId()
-				if err != nil {
-					var response modules.Response
-					response.Status = false
-					response.Message = err.Error()
-					logrus.Error(err.Error())
-					return 500, response
-				}
-				logrus.Printf("inserted id: %d, %s", idForSave, saveId)
 
-				write := ioutil.WriteFile(path+pathToFile, data, 0700)
+				write := ioutil.WriteFile(path+pathToFile, data, 0777)
 				if write != nil {
 					var response modules.Response
 					response.Status = false
